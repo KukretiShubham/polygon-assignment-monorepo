@@ -19,7 +19,7 @@ contract Deadmanswitch {
         _;
     }
     function isAlive() public view returns(bool){
-        return (lastBlock + 10 > block.number);
+        return (lastBlock + 10 >= block.number);
     }
     function itsdead() public {
         require(isAlive() == false,"ehh its not dead yet");
