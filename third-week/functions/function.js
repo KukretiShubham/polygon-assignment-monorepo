@@ -32,3 +32,10 @@ export const depositFUSD = async (amount) => {
     let price = await transaction.wait()
     return price;
 }
+export const connectWallet = async () => {
+    const web3Modal = new Web3Modal()
+    const connection = await web3Modal.connect()
+    const provider = new ethers.providers.Web3Provider(connection)    
+    const signer = provider.getSigner()
+    return signer._address;
+}

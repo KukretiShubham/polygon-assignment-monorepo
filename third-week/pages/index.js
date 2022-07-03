@@ -3,7 +3,7 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import { getnewprice, depositETH, depositFUSD } from "../functions/function"
+import { getnewprice, depositETH, depositFUSD, connectWallet } from "../functions/function"
 export default function Home() {
   useEffect(() => {
     fetchprice()
@@ -27,7 +27,9 @@ export default function Home() {
     console.log(receipt);
     router.push('/')
   }
-
+  const connect = async () => {
+    connectWallet();
+  }
   return (  
   <div className="bg-gradient-to-r from-gray-100 to-gray-300">
         {/* Navbar */}
@@ -54,13 +56,13 @@ export default function Home() {
                   <path d="M19 6h5V0h-5c-3.86 0-7 3.14-7 7v3H8v6h4v16h6V16h5l1-6h-6V7c0-.542.458-1 1-1z"></path>
                 </svg>
               </a>
-              <button className="bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500 font-bold mt-0.5 text-white rounded p-2 shadow-lg">Connect Wallet</button>
+              <button onClick={connect} className="bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500 font-bold mt-0.5 text-white rounded p-2 shadow-lg">Connect Wallet</button>
             </div>
           </div>
         </div>
         {/* Main body */}
       <div className="flex flex-col items-center"> Deployed on Rinkeby Testnet
-      <p>Current ETH/USD price {conversionprice.price}</p>
+      <p>Current ETH price <a className="underline">{conversionprice.price}</a> $FUSD</p>
       </div>
       <div className="flex justify-center h-screen my-auto items-center ">
         <div className="w-1/3 flex flex-col pb-4">
