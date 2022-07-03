@@ -1,0 +1,1 @@
+export const FusdContractAddress = "0x132d7843969a3983988500649C8F6FaAa71eac3F";
