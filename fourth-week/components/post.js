@@ -2,11 +2,14 @@ import { useRef, useState } from "react"
 import { create as ipfsHttpClient } from 'ipfs-http-client'
 import {XIcon} from "@heroicons/react/outline";
 const client = ipfsHttpClient('https://ipfs.infura.io:5001/api/v0')
+import {postToparrot} from "../function/function";
+import { useRouter } from 'next/router'
 
 export default function Post() {
-    const [input, setInput] = useState("");
+    const [formInput, updateFormInput] = useState({ chirp: "" })
     const [fileUrl, setFileUrl] = useState(null)
     const filePickerRef = useRef(null);
+    const router = useRouter()
     async function onChange(e) {
         const file = e.target.files[0]
         try {
@@ -23,13 +26,40 @@ export default function Post() {
           console.log('Error uploading file: ', error)
         }  
       }
+      async function createPost() {
+        const { chirp } = formInput
+        if (!chirp && !fileUrl)
+        {
+          console.log("Nothing to upload")
+          return
+        }
+        /* first, upload to IPFS */
+        const data = JSON.stringify({
+          message: chirp, image: fileUrl
+        })
+        try {
+          const added = await client.add(data)
+          const url = `https://ipfs.infura.io/ipfs/${added.path}`
+          /* after file is uploaded to IPFS, pass the URL to save it on Polygon */
+          console.log("Final post URL => ",url)
+          makepost(url)
+        } catch (error) {
+          console.log('Error uploading file: ', error)
+        }  
+      }
+    const makepost = async (uri) => {
+        const receipt = await postToparrot(uri);
+        console.log(receipt);
+        router.push('/')
+      }
     return (
-        <div className="flex justify-center my-auto items-center ">
+        <div className="flex justify-center my-auto items-center  ">
             <div className="w-1/3 flex flex-col pb-4">
                 <div className="border-green-500 mt-4 border-2 rounded p-4">
                     <textarea
                         placeholder="Chirpp.. your thoughts here"
                         className="w-full border-0 focus:ring-0 rounded tracking-wide"
+                        onChange={e => updateFormInput({ ...formInput, chirp: e.target.value })}
                     />
                     <input
                         type="file"
@@ -60,14 +90,10 @@ export default function Post() {
                     </button>
                 </div>
             <div className="flex justify-end">
-                <button className="bg-green-500 hover:bg-green-600 w-28 mt-4 text-white font-bold p-2 rounded-full ">
+                <button onClick={createPost} className="bg-green-500 hover:bg-green-600 w-28 mt-4 text-white font-bold p-2 rounded-full ">
                     Chirp
                 </button>
             </div>
-          <div className="flex justify-center my-auto items-center p-4">Made with _❤️ 
-            <a href="https://twitter.com/ShubhamKukretii"> _by Shubham
-            </a>
-          </div>
         </div>
     </div>
     )
